@@ -89,6 +89,9 @@ def process_df(df):
     print(lst_symbol)
 
 if __name__ == '__main__':
+    if not os.path.exists(config.OUTPUT_DIRECTORY):
+        os.makedirs(config.OUTPUT_DIRECTORY)
+
     interval = ['2022-06-15', '2022-10-08']
 
     build_synthetic_data.build_synthetic_data(interval)
