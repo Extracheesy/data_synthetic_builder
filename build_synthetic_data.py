@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import config
 
+import math
+
 import plot_data
 
 def fill_df_date(df, start_date, end_date):
@@ -47,7 +49,6 @@ def add_df_ohlv_noise(df, amplitude):
     df['low'] = np.where(df['close'] < df['open'],
                          df['close'] + df['close'] - df['high'],
                          df['low'])
-
     return df
 
 def build_synthetic_data(interval):
@@ -55,17 +56,19 @@ def build_synthetic_data(interval):
 
     df_synthetic = fill_df_date(df_synthetic, interval[0], interval[1])
 
-    df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_1', config.sinus_1_amplitude, config.sinus_1_freq, 0, config.sinus_1_height)
+    freq = 100 * math.pi / len(df_synthetic)
+    df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_1', config.sinus_1_amplitude, freq, 0, config.sinus_1_height)
 
-    freq = 6.3 / len(df_synthetic)
+    freq = 2 * math.pi / len(df_synthetic)
     df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_2', config.sinus_2_amplitude, freq, 0, config.sinus_2_height)
 
-    df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_3', config.sinus_3_amplitude, config.sinus_3_freq, 0, config.sinus_3_height)
+    freq = 100 * math.pi / len(df_synthetic)
+    df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_3', config.sinus_3_amplitude, freq, 0, config.sinus_3_height)
 
-    freq = 6.3 / len(df_synthetic) / 2
+    freq = 2 * math.pi / len(df_synthetic) / 2
     df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_4', config.sinus_4_amplitude, freq, 0, config.sinus_4_height)
 
-    freq = 6.3 / len(df_synthetic) / 2
+    freq = 2 * math.pi / len(df_synthetic) / 2
     df_synthetic = fill_df_sinusoid(df_synthetic, 'sinus_5', config.sinus_5_amplitude, freq, 0, config.sinus_5_height)
     df_synthetic['sinus_5'] = 1 - df_synthetic['sinus_5']
 
@@ -124,8 +127,7 @@ def build_synthetic_data(interval):
         plot_data.plot_ohlc(df_ohlv, filename)
         df_ohlv.to_csv(config.OUTPUT_DIRECTORY + filename + '.csv')
 
-        amplitude = 0.1
-        df_ohlv = add_df_ohlv_noise(df_ohlv, amplitude)
+        df_ohlv = add_df_ohlv_noise(df_ohlv, config.noise_amplitude)
         filename = 'ohlc_with_noise_' + type
         plot_data.plot_ohlc(df_ohlv, filename)
         df_ohlv.to_csv(config.OUTPUT_DIRECTORY + filename + '.csv')
